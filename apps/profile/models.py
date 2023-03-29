@@ -243,8 +243,8 @@ class Profile(models.Model):
         
         was_premium = self.is_premium
         self.is_premium = True
-        self.is_archive = False
-        self.is_pro = False
+        self.is_archive = True
+        self.is_pro = True
         self.save()
         self.user.is_active = True
         self.user.save()

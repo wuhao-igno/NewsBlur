@@ -1,5 +1,23 @@
 version: '2'
 services:
+  rsshub:
+    image: diygod/rsshub:chromium-bundled
+    restart: always
+    ports:
+      - '1200:1200'
+    environment:
+      NODE_ENV: production
+      CACHE_TYPE: redis
+      REDIS_URL: 'redis://redis:6379/'
+      ALLOW_ORIGIN: '*'
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:alpine
+    restart: always
+    volumes:
+      - redis-data:/data
 
   newsblur_web:
     hostname: nb.com
@@ -20,6 +38,7 @@ services:
       - db_postgres
       - db_redis
       - db_elasticsearch
+      - rsshub
     ulimits:
       nproc: 10000
       nofile:
@@ -169,9 +188,12 @@ services:
       - db_elasticsearch
       - db_mongo
     ports:
-      - 80:80
-      - 443:443
-      - 1936:1936
+      - 4080:80
+      - 4443:443
+      - 4936:1936
     volumes:
       - ./docker/haproxy/haproxy.docker-compose.cfg:/usr/local/etc/haproxy/haproxy.cfg
       - ${PWD}:/srv/newsblur
+
+volumes:
+  redis-data:
